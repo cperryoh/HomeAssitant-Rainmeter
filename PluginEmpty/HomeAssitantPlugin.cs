@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Nancy.Json;
+using Rainmeter;
+using System;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Rainmeter;
 
 // Overview: This is a blank canvas on which to build your plugin.
 
@@ -15,7 +15,7 @@ using Rainmeter;
 
 namespace HomeAssitantPlugin
 {
-    class Measure
+    public class Measure
     {
         public string auth;
         public string server;
@@ -26,6 +26,8 @@ namespace HomeAssitantPlugin
         }
         //public HttpClient client;
         public IntPtr buffer = IntPtr.Zero;
+
+        public string tracker;
     }
 
     public class Plugin
@@ -38,6 +40,7 @@ namespace HomeAssitantPlugin
             Measure measure = (Measure)data;
             //measure.client = new HttpClient();
             measure.api = api;
+            measure.tracker = api.ReadString("tracker", "");
             measure.server = api.ReadString("server", "homeassitant.local");
             measure.auth = api.ReadString("authKey", "");
         }
@@ -67,9 +70,7 @@ namespace HomeAssitantPlugin
         [DllExport]
         public static double Update(IntPtr data)
         {
-            Measure measure = (Measure)data;
-
-            return 0.0;
+            return -1.12;
         }
 
         //[DllExport]
@@ -108,6 +109,12 @@ namespace HomeAssitantPlugin
         //
         //    return measure.buffer;
         //}
+        /*[DllExport]
+        public static IntPtr getValue(IntPtr data, int argc,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr, SizeParamIndex = 1)] string[] argv)
+        {
+        }*/
+
         [DllExport]
         public static void ExecuteBang(IntPtr data, [MarshalAs(UnmanagedType.LPWStr)] string args)
         {
