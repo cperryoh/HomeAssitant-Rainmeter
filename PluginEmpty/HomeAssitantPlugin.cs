@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using Rainmeter;
 
 // Overview: This is a blank canvas on which to build your plugin.
@@ -20,16 +21,23 @@ namespace HomeAssitantPlugin
         public string auth;
         public string server;
         public API api;
+        public string id;
+        public string data="nan";
         static public implicit operator Measure(IntPtr data)
         {
             return (Measure)GCHandle.FromIntPtr(data).Target;
         }
         //public HttpClient client;
         public IntPtr buffer = IntPtr.Zero;
+        public string isInt;
     }
 
     public class Plugin
     {
+        class Entity
+        {
+            public string state { get; set; }
+        }
         [DllExport]
         public static void Initialize(ref IntPtr data, IntPtr rm)
         {
@@ -38,6 +46,8 @@ namespace HomeAssitantPlugin
             Measure measure = (Measure)data;
             //measure.client = new HttpClient();
             measure.api = api;
+            measure.id = api.ReadString("entityId", "");
+            measure.isInt = api.ReadString("isInt", "false").ToLower();
             measure.server = api.ReadString("server", "homeassitant.local");
             measure.auth = api.ReadString("authKey", "");
         }
@@ -60,6 +70,8 @@ namespace HomeAssitantPlugin
             Rainmeter.API api = (Rainmeter.API)rm;
             //measure.client = new HttpClient();
             measure.api = api;
+            measure.id = api.ReadString("entityId", "");
+            measure.isInt = api.ReadString("isInt", "false").ToLower();
             measure.server = api.ReadString("server", "homeassitant.local");
             measure.auth = api.ReadString("auth", "");
         }
@@ -68,24 +80,44 @@ namespace HomeAssitantPlugin
         public static double Update(IntPtr data)
         {
             Measure measure = (Measure)data;
-
-            return 0.0;
+            try
+            {
+                if (measure.id.Equals(""))
+                    return 0.0;
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {measure.auth}");
+                Task<HttpResponseMessage> response = client.GetAsync($"http://{measure.server}:8123/api/states/{measure.id}");
+                response.Wait();
+                Task<string> stringTask = response.Result.Content.ReadAsStringAsync();
+                stringTask.Wait();
+                string json = stringTask.Result;
+                measure.api.Log(API.LogType.Debug,json);
+                Entity entity = (new JavaScriptSerializer()).Deserialize<Entity>(json);
+                measure.data = entity.state;
+                if (measure.isInt.Equals("true"))
+                    return Int32.Parse(entity.state);
+                return 0.0;
+            }
+            catch(Exception e)
+            {
+                measure.api.Log(API.LogType.Error, e.Message);
+                return 0.0;
+            }
         }
 
-        //[DllExport]
-        //public static IntPtr GetString(IntPtr data)
-        //{
-        //    Measure measure = (Measure)data;
-        //    if (measure.buffer != IntPtr.Zero)
-        //    {
-        //        Marshal.FreeHGlobal(measure.buffer);
-        //        measure.buffer = IntPtr.Zero;
-        //    }
-        //
-        //    measure.buffer = Marshal.StringToHGlobalUni("");
-        //
-        //    return measure.buffer;
-        //}
+        [DllExport]
+        public static IntPtr GetString(IntPtr data)
+        {
+            Measure measure = (Measure)data;
+            if (measure.buffer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(measure.buffer);
+                measure.buffer = IntPtr.Zero;
+            }
+        
+            measure.buffer = Marshal.StringToHGlobalUni(measure.data);
+            return measure.buffer;
+        }
 
         //[DllExport]
         //public static void ExecuteBang(IntPtr data, [MarshalAs(UnmanagedType.LPWStr)]String args)
