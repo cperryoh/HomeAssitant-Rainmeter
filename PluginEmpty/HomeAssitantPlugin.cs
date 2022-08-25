@@ -112,6 +112,17 @@ namespace HomeAssitantPlugin
                 return 0.0;
             }
         }
+        public static bool isInt(string str)
+        {
+            try
+            {
+                int temp = Int32.Parse(str);
+                return true;
+            }catch(Exception e)
+            {
+                return false;
+            }
+        }
         public static string getValue(string path, Dictionary<string, object> json) 
         {
             string[] keys = path.Split('.');
@@ -120,7 +131,17 @@ namespace HomeAssitantPlugin
             JValue jsonValue;
             for(int i = 1; i< keys.Length; i++)
             {
-                jsonObject = jsonObject[keys[i]];
+                bool isNum = isInt(keys[i]);
+                if (isNum)
+                {
+                    int index = Int32.Parse(keys[i]);
+                    JArray objects =(JArray)jsonObject;
+                    jsonObject = objects[index];
+                }
+                else
+                {
+                    jsonObject = jsonObject[keys[i]];
+                }
             }
             jsonValue = (JValue)jsonObject;
             return jsonValue.Value.ToString();
