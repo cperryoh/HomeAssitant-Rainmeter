@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Rainmeter;
+using Newtonsoft.Json;
+using System.Dynamic;
 
 // Overview: This is a blank canvas on which to build your plugin.
 
@@ -30,6 +33,7 @@ namespace HomeAssitantPlugin
         //public HttpClient client;
         public IntPtr buffer = IntPtr.Zero;
         public string isInt;
+        public string path;
     }
 
     public class Plugin
@@ -46,6 +50,7 @@ namespace HomeAssitantPlugin
             Measure measure = (Measure)data;
             //measure.client = new HttpClient();
             measure.api = api;
+            measure.path = api.ReadString("path", "state");
             measure.id = api.ReadString("entityId", "");
             measure.isInt = api.ReadString("isInt", "false").ToLower();
             measure.server = api.ReadString("server", "homeassitant.local");
@@ -70,6 +75,7 @@ namespace HomeAssitantPlugin
             Rainmeter.API api = (Rainmeter.API)rm;
             //measure.client = new HttpClient();
             measure.api = api;
+            measure.path = api.ReadString("path", "state");
             measure.id = api.ReadString("entityId", "");
             measure.isInt = api.ReadString("isInt", "false").ToLower();
             measure.server = api.ReadString("server", "homeassitant.local");
@@ -91,32 +97,53 @@ namespace HomeAssitantPlugin
                 Task<string> stringTask = response.Result.Content.ReadAsStringAsync();
                 stringTask.Wait();
                 string json = stringTask.Result;
-                measure.api.Log(API.LogType.Debug,json);
-                Entity entity = (new JavaScriptSerializer()).Deserialize<Entity>(json);
-                measure.data = entity.state;
+                measure.api.Log(API.LogType.Debug, json);
+                var values = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                string jsonOut = getValue(measure.path, values);
+                measure.data= jsonOut;
                 if (measure.isInt.Equals("true"))
-                    return Int32.Parse(entity.state);
+                    return Double.Parse(jsonOut);
+                //return Int32.Parse(entity.state);
                 return 0.0;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 measure.api.Log(API.LogType.Error, e.Message);
                 return 0.0;
             }
         }
-
+        public static string getValue(string path, Dictionary<string, object> json) 
+        {
+            string[] keys = path.Split('.');
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject = json[keys[0]];
+            JValue jsonValue;
+            for(int i = 1; i< keys.Length; i++)
+            {
+                jsonObject = jsonObject[keys[i]];
+            }
+            jsonValue = (JValue)jsonObject;
+            return jsonValue.Value.ToString();
+        }
         [DllExport]
         public static IntPtr GetString(IntPtr data)
         {
             Measure measure = (Measure)data;
-            if (measure.buffer != IntPtr.Zero)
+            try
             {
-                Marshal.FreeHGlobal(measure.buffer);
-                measure.buffer = IntPtr.Zero;
+                if (measure.buffer != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(measure.buffer);
+                    measure.buffer = IntPtr.Zero;
+                }
+
+                measure.buffer = Marshal.StringToHGlobalUni(measure.data);
+                return measure.buffer;
+            }catch(Exception e)
+            {
+                measure.api.Log(API.LogType.Error, e.Message);
+                return Marshal.StringToHGlobalUni("could not get data");
             }
-        
-            measure.buffer = Marshal.StringToHGlobalUni(measure.data);
-            return measure.buffer;
         }
 
         //[DllExport]
