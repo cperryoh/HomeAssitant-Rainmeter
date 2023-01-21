@@ -121,7 +121,7 @@ Note: to find the jsons of other entitys you may have,go to http://homeassistant
 
 
 
-If we wanted the forcast for 2022-08-26 the path would be the following, `attributes.forcast.1.condition`. If we wanted the next day, we would change the index from 1 to 2. By default path is set to state so it automatically returns the state of the entity
+If we wanted the forcast for 2023-01-22 the path would be the following, `attributes.forcast.1.condition`. If we wanted the next day, we would change the index from 1 to 2. By default path is set to state so it automatically returns the state of the entity
 ## Calling services
 In order to call a service use bangs.
 
