@@ -1,6 +1,6 @@
 # HomeAssitant-Rainmeter
 ## Set up
-- Head over to your hassio server and create an api token by going to your use profile
+- Head over to your hassio server and create an api token by going to your user profile
 - Put the .dll in your plugins folder
 - Add this measure to your raimeter skin and fill in your values
   ```
