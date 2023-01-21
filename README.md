@@ -122,3 +122,41 @@ Note: to find the jsons of other entitys you may have,go to http://homeassistant
 
 
 If we wanted the forcast for 2022-08-26 the path would be the following, `attributes.forcast.1.condition`. If we wanted the next day, we would change the index from 1 to 2. By default path is set to state so it automatically returns the state of the entity
+## Calling services
+In order to call a service use bangs.
+
+`[!CommandMeasure hassio "<domain>!<service>!<service data>"]`
+
+For example, if we wanted to toggle a switch named fan we would use the following bang:
+
+`[!CommandMeasure hassio "switch!toggle!{'entity_id': 'switch.fan'}"]`
+
+Note: Single quotes **MUST** be used in the json for service data
+
+If you are unsure about how to structure the service data json go to http://homeassistant:8123/developer-tools/service, build your service using the ui and then go to yaml mode and base the json off that. 
+
+For example, take this service
+```
+service: light.turn_on
+data:
+  rgb_color:
+    - 225
+    - 0
+    - 0
+  transition: 24
+target:
+  entity_id: light.lamp
+```
+
+The json would be:
+```
+{
+'rgb_color':[225,0,0],
+'transition': 24,
+'entity_id':'light.lamp'
+}
+```
+And the bang would be:
+```
+LeftMouseUpAction=[!CommandMeasure hassio "light!turn_on!{'rgb_color':[255,0,0],'transition': 2,'entity_id':'light.lamp'}"]
+```
