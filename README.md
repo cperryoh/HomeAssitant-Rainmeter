@@ -116,7 +116,7 @@ Say we have the following json of a weather object:
     }
 }
 ```
-Note: to find the jsons of other entitys you may have, http://homeassistant:8123/developer-tools/state, any value you find in there will be prefaced by `attributes.` in the path. The plugin also outputs the json hassio gives to the rainmeter log file.
+Note: to find the jsons of other entitys you may have,go to http://homeassistant:8123/developer-tools/state, any value you find in there will be prefaced by `attributes.` in the path. The plugin also outputs the json hassio gives to the rainmeter log file.
 ![image](https://user-images.githubusercontent.com/46071730/213832008-57dee21b-bd8c-4ed4-b40a-43ed545907f3.png)
 
 
