@@ -13,7 +13,7 @@
 ## Useage
 ### Configuration
 |  Varible          | Description                                                          | Default |
-|     :----:        |    :----:                                                            |  :----: |
+|     :----         |    :----                                                            |  :---- |
 | `auth`              | Auth token from home assistant                                     |`<empty>`|
 | `server`            | Hassio server IP                                                   |`<empty>`|
 | `path`(optional)    | Attribute path from entity                                         |`"state"`|
