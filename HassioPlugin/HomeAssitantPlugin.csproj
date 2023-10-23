@@ -103,7 +103,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="HomeAssitantPlugin.cs" />
-    <Compile Include="$(SolutionDir)..\API\RainmeterAPI.cs" />
+    <Compile Include="$(SolutionDir)\API\RainmeterAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -117,7 +117,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)..\API\DllExporter.exe" "$(ConfigurationName)" "$(PlatformName)" "$(TargetDir)\" "$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir)\API\DllExporter.exe" "$(ConfigurationName)" "$(PlatformName)" "$(TargetDir)\" "$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Fody.6.6.3\build\Fody.targets" Condition="Exists('..\packages\Fody.6.6.3\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
