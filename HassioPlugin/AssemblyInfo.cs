@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyCopyright("© 2014 - YOUR NAME")]
+[assembly: AssemblyCopyright("© 2014 - u\\cperryoh")]
 [assembly: AssemblyVersion("1.0.0.0")]
 
 // Do not change the entries below!
