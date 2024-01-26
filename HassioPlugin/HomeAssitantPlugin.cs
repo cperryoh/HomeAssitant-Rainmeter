@@ -19,7 +19,7 @@ using System.Dynamic;
 
 namespace HomeAssitantPlugin
 {
-    class Measure
+    public class Measure
     {
         public string auth;
         public string server;
@@ -32,7 +32,9 @@ namespace HomeAssitantPlugin
         }
         //public HttpClient client;
         public IntPtr buffer = IntPtr.Zero;
+        public bool ssl;
         public string isInt;
+        public string fullUrl;
         public string path;
     }
 
@@ -48,13 +50,7 @@ namespace HomeAssitantPlugin
             data = GCHandle.ToIntPtr(GCHandle.Alloc(new Measure()));
             Rainmeter.API api = (Rainmeter.API)rm;
             Measure measure = (Measure)data;
-            //measure.client = new HttpClient();
-            measure.api = api;
-            measure.path = api.ReadString("path", "state");
-            measure.id = api.ReadString("entityId", "");
-            measure.isInt = api.ReadString("isInt", "false").ToLower();
-            measure.server = api.ReadString("server", "homeassitant.local");
-            measure.auth = api.ReadString("authKey", "");
+            init(measure,api);
         }
 
         [DllExport]
@@ -73,13 +69,22 @@ namespace HomeAssitantPlugin
         {
             Measure measure = (Measure)data;
             Rainmeter.API api = (Rainmeter.API)rm;
-            //measure.client = new HttpClient();
+            init(measure, api);
+        }
+        public static void init(Measure measure,API api) {
             measure.api = api;
             measure.path = api.ReadString("path", "state");
             measure.id = api.ReadString("entityId", "");
             measure.isInt = api.ReadString("isInt", "false").ToLower();
             measure.server = api.ReadString("server", "homeassitant.local");
-            measure.auth = api.ReadString("auth", "");
+            measure.ssl = api.ReadString("ssl", "false").ToLower() == "true";
+            measure.auth = api.ReadString("authKey", "");
+            int port = api.ReadInt("port", -1);
+            string portStr = (port == -1) ? "" : ":" + port;
+            if (measure.ssl)
+                measure.fullUrl = "https://" + measure.server + portStr;
+            else
+                measure.fullUrl = "http://" + measure.server + portStr;
         }
 
         [DllExport]
@@ -92,7 +97,7 @@ namespace HomeAssitantPlugin
                     return 0.0;
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {measure.auth}");
-                Task<HttpResponseMessage> response = client.GetAsync($"http://{measure.server}:8123/api/states/{measure.id}");
+                Task<HttpResponseMessage> response = client.GetAsync($"{measure.fullUrl}/api/states/{measure.id}");
                 response.Wait();
                 Task<string> stringTask = response.Result.Content.ReadAsStringAsync();
                 stringTask.Wait();
@@ -214,7 +219,7 @@ namespace HomeAssitantPlugin
                 // !CommandMeasure was used on this measure...any arguments will be in args
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {measure.auth}");
                 var content = new StringContent(serviceData);
-                Task<HttpResponseMessage> response = client.PostAsync($"http://{measure.server}:8123/api/services/{device}/{service}", content);
+                Task<HttpResponseMessage> response = client.PostAsync($"{measure.fullUrl}/api/services/{device}/{service}", content);
                 response.Wait();
                 Task<String> getText = response.Result.Content.ReadAsStringAsync();
                 getText.Wait();
