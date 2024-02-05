@@ -18,7 +18,7 @@
 | `server`             | Hassio server IP or domain name (192.168... or exampledoamin.com)                          |`<empty>`|
 | `path`(optional)     | Attribute path from entity                                                                 |`"state"`|
 | `ssl`(optional)      | Should the api use ssl or not(true/false)                                                  |`false`  |
-| `port`(optional)     | Port of the hassio server. Use -1 to denote no port and use the default web ports instead  |`-1`|                
+| `port`(optional)     | Port of the hassio server. Use -1 to denote no port and use the default web ports instead(443/80)  |`-1`|                
 | `isInt`(optional)    | Set to `true` if the attribute or state you are pulling is a number                        |`false`  |
 | `entityId`(optional) | Entity from home assistant to pull data from                                               |`<empty>`|
 ### Showing data
