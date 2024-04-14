@@ -76,7 +76,7 @@ namespace HomeAssitantPlugin
             measure.path = api.ReadString("path", "state");
             measure.id = api.ReadString("entityId", "");
             measure.isInt = api.ReadString("isInt", "false").ToLower();
-            measure.server = api.ReadString("server", "homeassitant.local");
+            measure.server = api.ReadString("server", "homeassistant.local");
             measure.ssl = api.ReadString("ssl", "false").ToLower() == "true";
             measure.auth = api.ReadString("authKey", "");
             int port = api.ReadInt("port", -1);
@@ -95,7 +95,9 @@ namespace HomeAssitantPlugin
             {
                 if (measure.id.Equals(""))
                     return 0.0;
-                HttpClient client = new HttpClient();
+                var handler = new HttpClientHandler();
+                handler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
+                var client = new HttpClient(handler);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {measure.auth}");
                 Task<HttpResponseMessage> response = client.GetAsync($"{measure.fullUrl}/api/states/{measure.id}");
                 response.Wait();
