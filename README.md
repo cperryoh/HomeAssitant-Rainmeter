@@ -28,7 +28,7 @@ To display data simply do this(if you are trying to use a meter that requires nu
 Measure=Plugin
 Plugin=#SETTINGSPATH#\Plugins\HomeAssitantPlugin.dll
 server=homeassistant.local
-auth=<auth token>
+authKey=<auth token>
 entityId=switch.example
 isInt=true
 [example]
