@@ -24,13 +24,16 @@
 ### Showing data
 To display data simply do this(if you are trying to use a meter that requires numerical data ensure isInt is true):
 ```
+#note this is for an ssl configuration
 [hassio]
 Measure=Plugin
-Plugin=#SETTINGSPATH#\Plugins\HomeAssitantPlugin.dll
-server=homeassistant.local
-authKey=<auth token>
-entityId=switch.example
-isInt=true
+Plugin=SETTINGSPATH\Plugins\HomeAssitantPlugin.dll
+authKey=<api-key>
+server=<my-domain name>
+ssl=true
+port=443
+entityId=light.other_lamp
+isInt=false
 [example]
 Meter=String
 MeasureName=hassio
