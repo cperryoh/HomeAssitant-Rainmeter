@@ -7,8 +7,9 @@
   [hassio]
   Measure=Plugin
   Plugin=#SETTINGSPATH#\Plugins\HomeAssitantPlugin.dll
-  auth=<api-key-from-hassio>
+  authKey=<api-key-from-hassio>
   server=<ip> #server ip
+  ssl=false
   ```
 ## Useage
 ### Configuration
